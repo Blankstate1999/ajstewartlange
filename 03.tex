@@ -1,0 +1,904 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={03.R},
+  pdfauthor={leeme},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{03.R}
+\author{leeme}
+\date{2021-09-02}
+
+\begin{document}
+\maketitle
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Data wrangling {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'tidyverse' was built under R version 3.6.3
+\end{verbatim}
+
+\begin{verbatim}
+## -- Attaching packages --------------------------------------- tidyverse 1.3.1 --
+\end{verbatim}
+
+\begin{verbatim}
+## v ggplot2 3.3.5     v purrr   0.3.4
+## v tibble  3.1.1     v dplyr   1.0.6
+## v tidyr   1.1.3     v stringr 1.4.0
+## v readr   1.4.0     v forcats 0.5.1
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'tibble' was built under R version 3.6.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'tidyr' was built under R version 3.6.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'readr' was built under R version 3.6.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'purrr' was built under R version 3.6.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'dplyr' was built under R version 3.6.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'forcats' was built under R version 3.6.3
+\end{verbatim}
+
+\begin{verbatim}
+## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(mpg,}\DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 10 x 11
+##    manufacturer model    displ  year   cyl trans   drv     cty   hwy fl    class
+##    <chr>        <chr>    <dbl> <int> <int> <chr>   <chr> <int> <int> <chr> <chr>
+##  1 audi         a4         1.8  1999     4 auto(l~ f        18    29 p     comp~
+##  2 audi         a4         1.8  1999     4 manual~ f        21    29 p     comp~
+##  3 audi         a4         2    2008     4 manual~ f        20    31 p     comp~
+##  4 audi         a4         2    2008     4 auto(a~ f        21    30 p     comp~
+##  5 audi         a4         2.8  1999     6 auto(l~ f        16    26 p     comp~
+##  6 audi         a4         2.8  1999     6 manual~ f        18    26 p     comp~
+##  7 audi         a4         3.1  2008     6 auto(a~ f        18    27 p     comp~
+##  8 audi         a4 quat~   1.8  1999     4 manual~ 4        18    26 p     comp~
+##  9 audi         a4 quat~   1.8  1999     4 auto(l~ 4        16    25 p     comp~
+## 10 audi         a4 quat~   2    2008     4 manual~ 4        20    28 p     comp~
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{str}\NormalTok{(mpg)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## tibble [234 x 11] (S3: tbl_df/tbl/data.frame)
+##  $ manufacturer: chr [1:234] "audi" "audi" "audi" "audi" ...
+##  $ model       : chr [1:234] "a4" "a4" "a4" "a4" ...
+##  $ displ       : num [1:234] 1.8 1.8 2 2 2.8 2.8 3.1 1.8 1.8 2 ...
+##  $ year        : int [1:234] 1999 1999 2008 2008 1999 1999 2008 1999 1999 2008 ...
+##  $ cyl         : int [1:234] 4 4 4 4 6 6 6 4 4 4 ...
+##  $ trans       : chr [1:234] "auto(l5)" "manual(m5)" "manual(m6)" "auto(av)" ...
+##  $ drv         : chr [1:234] "f" "f" "f" "f" ...
+##  $ cty         : int [1:234] 18 21 20 21 16 18 18 18 16 20 ...
+##  $ hwy         : int [1:234] 29 29 31 30 26 26 27 26 25 28 ...
+##  $ fl          : chr [1:234] "p" "p" "p" "p" ...
+##  $ class       : chr [1:234] "compact" "compact" "compact" "compact" ...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mpg }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{select}\NormalTok{(manufacturer)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 234 x 1
+##    manufacturer
+##    <chr>       
+##  1 audi        
+##  2 audi        
+##  3 audi        
+##  4 audi        
+##  5 audi        
+##  6 audi        
+##  7 audi        
+##  8 audi        
+##  9 audi        
+## 10 audi        
+## # ... with 224 more rows
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mpg }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{distinct}\NormalTok{(manufacturer) }\SpecialCharTok{\%\textgreater{}\%}  \CommentTok{\#Identifies unique entries}
+  \FunctionTok{count}\NormalTok{()                     }\CommentTok{\#Counts unique entries}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 1
+##       n
+##   <int>
+## 1    15
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mpg }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(manufacturer }\SpecialCharTok{==} \StringTok{"honda"}\NormalTok{) }\CommentTok{\#Extracts all \textquotesingle{}Honda\textquotesingle{} entries}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 9 x 11
+##   manufacturer model displ  year   cyl trans    drv     cty   hwy fl    class   
+##   <chr>        <chr> <dbl> <int> <int> <chr>    <chr> <int> <int> <chr> <chr>   
+## 1 honda        civic   1.6  1999     4 manual(~ f        28    33 r     subcomp~
+## 2 honda        civic   1.6  1999     4 auto(l4) f        24    32 r     subcomp~
+## 3 honda        civic   1.6  1999     4 manual(~ f        25    32 r     subcomp~
+## 4 honda        civic   1.6  1999     4 manual(~ f        23    29 p     subcomp~
+## 5 honda        civic   1.6  1999     4 auto(l4) f        24    32 r     subcomp~
+## 6 honda        civic   1.8  2008     4 manual(~ f        26    34 r     subcomp~
+## 7 honda        civic   1.8  2008     4 auto(l5) f        25    36 r     subcomp~
+## 8 honda        civic   1.8  2008     4 auto(l5) f        24    36 c     subcomp~
+## 9 honda        civic   2    2008     4 manual(~ f        21    29 p     subcomp~
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mpg }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(manufacturer }\SpecialCharTok{==} \StringTok{"honda"} \SpecialCharTok{|}\NormalTok{ manufacturer }\SpecialCharTok{==} \StringTok{"audi"}\NormalTok{)  }\CommentTok{\# | = \textquotesingle{}or\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 27 x 11
+##    manufacturer model    displ  year   cyl trans   drv     cty   hwy fl    class
+##    <chr>        <chr>    <dbl> <int> <int> <chr>   <chr> <int> <int> <chr> <chr>
+##  1 audi         a4         1.8  1999     4 auto(l~ f        18    29 p     comp~
+##  2 audi         a4         1.8  1999     4 manual~ f        21    29 p     comp~
+##  3 audi         a4         2    2008     4 manual~ f        20    31 p     comp~
+##  4 audi         a4         2    2008     4 auto(a~ f        21    30 p     comp~
+##  5 audi         a4         2.8  1999     6 auto(l~ f        16    26 p     comp~
+##  6 audi         a4         2.8  1999     6 manual~ f        18    26 p     comp~
+##  7 audi         a4         3.1  2008     6 auto(a~ f        18    27 p     comp~
+##  8 audi         a4 quat~   1.8  1999     4 manual~ 4        18    26 p     comp~
+##  9 audi         a4 quat~   1.8  1999     4 auto(l~ 4        16    25 p     comp~
+## 10 audi         a4 quat~   2    2008     4 manual~ 4        20    28 p     comp~
+## # ... with 17 more rows
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mpg }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(manufacturer }\SpecialCharTok{==} \StringTok{"honda"} \SpecialCharTok{\&}\NormalTok{ year }\SpecialCharTok{==} \StringTok{"1999"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(manufacturer, year, cty, hwy)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 5 x 4
+##   manufacturer  year   cty   hwy
+##   <chr>        <int> <int> <int>
+## 1 honda         1999    28    33
+## 2 honda         1999    24    32
+## 3 honda         1999    25    32
+## 4 honda         1999    23    29
+## 5 honda         1999    24    32
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mpg }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{manufacturer =} \FunctionTok{str\_to\_title}\NormalTok{(manufacturer), }
+         \AttributeTok{model =} \FunctionTok{str\_to\_title}\NormalTok{(model)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(manufacturer, model, year, trans, hwy)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 234 x 5
+##    manufacturer model       year trans        hwy
+##    <chr>        <chr>      <int> <chr>      <int>
+##  1 Audi         A4          1999 auto(l5)      29
+##  2 Audi         A4          1999 manual(m5)    29
+##  3 Audi         A4          2008 manual(m6)    31
+##  4 Audi         A4          2008 auto(av)      30
+##  5 Audi         A4          1999 auto(l5)      26
+##  6 Audi         A4          1999 manual(m5)    26
+##  7 Audi         A4          2008 auto(av)      27
+##  8 Audi         A4 Quattro  1999 manual(m5)    26
+##  9 Audi         A4 Quattro  1999 auto(l5)      25
+## 10 Audi         A4 Quattro  2008 manual(m6)    28
+## # ... with 224 more rows
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{my\_messy\_data }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/ajstewartlang/03\_data\_wrangling/master/data/my\_data.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## -- Column specification --------------------------------------------------------
+## cols(
+##   participant = col_double(),
+##   condition = col_double(),
+##   rt = col_double()
+## )
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(my\_messy\_data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 6 x 3
+##   participant condition    rt
+##         <dbl>     <dbl> <dbl>
+## 1           1         1   879
+## 2           1         2  1027
+## 3           1         3  1108
+## 4           1         4   765
+## 5           2         1  1042
+## 6           2         2  1050
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{my\_tidied\_data }\OtherTok{\textless{}{-}}\NormalTok{ my\_messy\_data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{condition =} \FunctionTok{recode}\NormalTok{(condition,}
+                            \StringTok{"1"} \OtherTok{=} \StringTok{"PrimeA\_TargetA"}\NormalTok{,}
+                            \StringTok{"2"} \OtherTok{=} \StringTok{"PrimeA\_TargetB"}\NormalTok{,}
+                            \StringTok{"3"} \OtherTok{=} \StringTok{"PrimeB\_TargetA"}\NormalTok{,}
+                            \StringTok{"4"} \OtherTok{=} \StringTok{"PrimeB\_TargetB"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{separate}\NormalTok{(}\AttributeTok{col =} \StringTok{"condition"}\NormalTok{, }\AttributeTok{into =} \FunctionTok{c}\NormalTok{(}\StringTok{"Prime"}\NormalTok{, }\StringTok{"Target"}\NormalTok{), }\AttributeTok{sep =} \StringTok{"\_"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Prime =} \FunctionTok{factor}\NormalTok{(Prime), }\AttributeTok{Target =} \FunctionTok{factor}\NormalTok{(Target))}
+
+
+\CommentTok{\#Data summarizing {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+
+\FunctionTok{library}\NormalTok{(tidyverse)}
+
+\NormalTok{mpg }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(manufacturer) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{mean\_hwy =} \FunctionTok{mean}\NormalTok{(hwy), }\AttributeTok{sd\_hwy =} \FunctionTok{sd}\NormalTok{(hwy), }\AttributeTok{number =} \FunctionTok{n}\NormalTok{()) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{arrange}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{mean\_hwy)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 15 x 4
+##    manufacturer mean_hwy sd_hwy number
+##    <chr>           <dbl>  <dbl>  <int>
+##  1 honda            32.6   2.55      9
+##  2 volkswagen       29.2   5.32     27
+##  3 hyundai          26.9   2.18     14
+##  4 audi             26.4   2.18     18
+##  5 pontiac          26.4   1.14      5
+##  6 subaru           25.6   1.16     14
+##  7 toyota           24.9   6.17     34
+##  8 nissan           24.6   5.09     13
+##  9 chevrolet        21.9   5.11     19
+## 10 ford             19.4   3.33     25
+## 11 mercury          18     1.15      4
+## 12 dodge            17.9   3.57     37
+## 13 jeep             17.6   3.25      8
+## 14 lincoln          17     1         3
+## 15 land rover       16.5   1.73      4
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mpg }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(manufacturer) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise\_at}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"displ"}\NormalTok{, }\StringTok{"cty"}\NormalTok{, }\StringTok{"hwy"}\NormalTok{), mean, }\AttributeTok{na.rm =}\NormalTok{ T)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 15 x 4
+##    manufacturer displ   cty   hwy
+##    <chr>        <dbl> <dbl> <dbl>
+##  1 audi          2.54  17.6  26.4
+##  2 chevrolet     5.06  15    21.9
+##  3 dodge         4.38  13.1  17.9
+##  4 ford          4.54  14    19.4
+##  5 honda         1.71  24.4  32.6
+##  6 hyundai       2.43  18.6  26.9
+##  7 jeep          4.58  13.5  17.6
+##  8 land rover    4.3   11.5  16.5
+##  9 lincoln       5.4   11.3  17  
+## 10 mercury       4.4   13.2  18  
+## 11 nissan        3.27  18.1  24.6
+## 12 pontiac       3.96  17    26.4
+## 13 subaru        2.46  19.3  25.6
+## 14 toyota        2.95  18.5  24.9
+## 15 volkswagen    2.26  20.9  29.2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mpg }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(manufacturer) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise\_if}\NormalTok{(is.numeric, mean, }\AttributeTok{na.rm =}\NormalTok{ T)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 15 x 6
+##    manufacturer displ  year   cyl   cty   hwy
+##    <chr>        <dbl> <dbl> <dbl> <dbl> <dbl>
+##  1 audi          2.54 2004.  5.22  17.6  26.4
+##  2 chevrolet     5.06 2005.  7.26  15    21.9
+##  3 dodge         4.38 2004.  7.08  13.1  17.9
+##  4 ford          4.54 2003.  7.2   14    19.4
+##  5 honda         1.71 2003   4     24.4  32.6
+##  6 hyundai       2.43 2004.  4.86  18.6  26.9
+##  7 jeep          4.58 2006.  7.25  13.5  17.6
+##  8 land rover    4.3  2004.  8     11.5  16.5
+##  9 lincoln       5.4  2002   8     11.3  17  
+## 10 mercury       4.4  2004.  7     13.2  18  
+## 11 nissan        3.27 2004.  5.54  18.1  24.6
+## 12 pontiac       3.96 2003.  6.4   17    26.4
+## 13 subaru        2.46 2004.  4     19.3  25.6
+## 14 toyota        2.95 2003.  5.12  18.5  24.9
+## 15 volkswagen    2.26 2003.  4.59  20.9  29.2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mpg }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(manufacturer) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{mean\_hwy =} \FunctionTok{mean}\NormalTok{(hwy), }\AttributeTok{sd\_hwy =} \FunctionTok{sd}\NormalTok{(hwy)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{class, }\SpecialCharTok{{-}}\NormalTok{trans)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 234 x 11
+## # Groups:   manufacturer [15]
+##    manufacturer model  displ  year   cyl drv     cty   hwy fl    mean_hwy sd_hwy
+##    <chr>        <chr>  <dbl> <int> <int> <chr> <int> <int> <chr>    <dbl>  <dbl>
+##  1 audi         a4       1.8  1999     4 f        18    29 p         26.4   2.18
+##  2 audi         a4       1.8  1999     4 f        21    29 p         26.4   2.18
+##  3 audi         a4       2    2008     4 f        20    31 p         26.4   2.18
+##  4 audi         a4       2    2008     4 f        21    30 p         26.4   2.18
+##  5 audi         a4       2.8  1999     6 f        16    26 p         26.4   2.18
+##  6 audi         a4       2.8  1999     6 f        18    26 p         26.4   2.18
+##  7 audi         a4       3.1  2008     6 f        18    27 p         26.4   2.18
+##  8 audi         a4 qu~   1.8  1999     4 4        18    26 p         26.4   2.18
+##  9 audi         a4 qu~   1.8  1999     4 4        16    25 p         26.4   2.18
+## 10 audi         a4 qu~   2    2008     4 4        20    28 p         26.4   2.18
+## # ... with 224 more rows
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mpg\_with\_mean }\OtherTok{\textless{}{-}}\NormalTok{ mpg }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(manufacturer) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{mean\_hwy =} \FunctionTok{mean}\NormalTok{(hwy), }\AttributeTok{sd\_hwy =} \FunctionTok{sd}\NormalTok{(hwy)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{class, }\SpecialCharTok{{-}}\NormalTok{trans)}
+
+\FunctionTok{head}\NormalTok{(mpg\_with\_mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 6 x 11
+## # Groups:   manufacturer [1]
+##   manufacturer model displ  year   cyl drv     cty   hwy fl    mean_hwy sd_hwy
+##   <chr>        <chr> <dbl> <int> <int> <chr> <int> <int> <chr>    <dbl>  <dbl>
+## 1 audi         a4      1.8  1999     4 f        18    29 p         26.4   2.18
+## 2 audi         a4      1.8  1999     4 f        21    29 p         26.4   2.18
+## 3 audi         a4      2    2008     4 f        20    31 p         26.4   2.18
+## 4 audi         a4      2    2008     4 f        21    30 p         26.4   2.18
+## 5 audi         a4      2.8  1999     6 f        16    26 p         26.4   2.18
+## 6 audi         a4      2.8  1999     6 f        18    26 p         26.4   2.18
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{str}\NormalTok{(mpg\_with\_mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## grouped_df [234 x 11] (S3: grouped_df/tbl_df/tbl/data.frame)
+##  $ manufacturer: chr [1:234] "audi" "audi" "audi" "audi" ...
+##  $ model       : chr [1:234] "a4" "a4" "a4" "a4" ...
+##  $ displ       : num [1:234] 1.8 1.8 2 2 2.8 2.8 3.1 1.8 1.8 2 ...
+##  $ year        : int [1:234] 1999 1999 2008 2008 1999 1999 2008 1999 1999 2008 ...
+##  $ cyl         : int [1:234] 4 4 4 4 6 6 6 4 4 4 ...
+##  $ drv         : chr [1:234] "f" "f" "f" "f" ...
+##  $ cty         : int [1:234] 18 21 20 21 16 18 18 18 16 20 ...
+##  $ hwy         : int [1:234] 29 29 31 30 26 26 27 26 25 28 ...
+##  $ fl          : chr [1:234] "p" "p" "p" "p" ...
+##  $ mean_hwy    : num [1:234] 26.4 26.4 26.4 26.4 26.4 ...
+##  $ sd_hwy      : num [1:234] 2.18 2.18 2.18 2.18 2.18 ...
+##  - attr(*, "groups")= tibble [15 x 2] (S3: tbl_df/tbl/data.frame)
+##   ..$ manufacturer: chr [1:15] "audi" "chevrolet" "dodge" "ford" ...
+##   ..$ .rows       : list<int> [1:15] 
+##   .. ..$ : int [1:18] 1 2 3 4 5 6 7 8 9 10 ...
+##   .. ..$ : int [1:19] 19 20 21 22 23 24 25 26 27 28 ...
+##   .. ..$ : int [1:37] 38 39 40 41 42 43 44 45 46 47 ...
+##   .. ..$ : int [1:25] 75 76 77 78 79 80 81 82 83 84 ...
+##   .. ..$ : int [1:9] 100 101 102 103 104 105 106 107 108
+##   .. ..$ : int [1:14] 109 110 111 112 113 114 115 116 117 118 ...
+##   .. ..$ : int [1:8] 123 124 125 126 127 128 129 130
+##   .. ..$ : int [1:4] 131 132 133 134
+##   .. ..$ : int [1:3] 135 136 137
+##   .. ..$ : int [1:4] 138 139 140 141
+##   .. ..$ : int [1:13] 142 143 144 145 146 147 148 149 150 151 ...
+##   .. ..$ : int [1:5] 155 156 157 158 159
+##   .. ..$ : int [1:14] 160 161 162 163 164 165 166 167 168 169 ...
+##   .. ..$ : int [1:34] 174 175 176 177 178 179 180 181 182 183 ...
+##   .. ..$ : int [1:27] 208 209 210 211 212 213 214 215 216 217 ...
+##   .. ..@ ptype: int(0) 
+##   ..- attr(*, ".drop")= logi TRUE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(starwars)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 6 x 14
+##   name     height  mass hair_color  skin_color eye_color birth_year sex   gender
+##   <chr>     <int> <dbl> <chr>       <chr>      <chr>          <dbl> <chr> <chr> 
+## 1 Luke Sk~    172    77 blond       fair       blue            19   male  mascu~
+## 2 C-3PO       167    75 <NA>        gold       yellow         112   none  mascu~
+## 3 R2-D2        96    32 <NA>        white, bl~ red             33   none  mascu~
+## 4 Darth V~    202   136 none        white      yellow          41.9 male  mascu~
+## 5 Leia Or~    150    49 brown       light      brown           19   fema~ femin~
+## 6 Owen La~    178   120 brown, grey light      blue            52   male  mascu~
+## # ... with 5 more variables: homeworld <chr>, species <chr>, films <list>,
+## #   vehicles <list>, starships <list>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{str}\NormalTok{(starwars)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## tibble [87 x 14] (S3: tbl_df/tbl/data.frame)
+##  $ name      : chr [1:87] "Luke Skywalker" "C-3PO" "R2-D2" "Darth Vader" ...
+##  $ height    : int [1:87] 172 167 96 202 150 178 165 97 183 182 ...
+##  $ mass      : num [1:87] 77 75 32 136 49 120 75 32 84 77 ...
+##  $ hair_color: chr [1:87] "blond" NA NA "none" ...
+##  $ skin_color: chr [1:87] "fair" "gold" "white, blue" "white" ...
+##  $ eye_color : chr [1:87] "blue" "yellow" "red" "yellow" ...
+##  $ birth_year: num [1:87] 19 112 33 41.9 19 52 47 NA 24 57 ...
+##  $ sex       : chr [1:87] "male" "none" "none" "male" ...
+##  $ gender    : chr [1:87] "masculine" "masculine" "masculine" "masculine" ...
+##  $ homeworld : chr [1:87] "Tatooine" "Tatooine" "Naboo" "Tatooine" ...
+##  $ species   : chr [1:87] "Human" "Droid" "Droid" "Human" ...
+##  $ films     :List of 87
+##   ..$ : chr [1:5] "The Empire Strikes Back" "Revenge of the Sith" "Return of the Jedi" "A New Hope" ...
+##   ..$ : chr [1:6] "The Empire Strikes Back" "Attack of the Clones" "The Phantom Menace" "Revenge of the Sith" ...
+##   ..$ : chr [1:7] "The Empire Strikes Back" "Attack of the Clones" "The Phantom Menace" "Revenge of the Sith" ...
+##   ..$ : chr [1:4] "The Empire Strikes Back" "Revenge of the Sith" "Return of the Jedi" "A New Hope"
+##   ..$ : chr [1:5] "The Empire Strikes Back" "Revenge of the Sith" "Return of the Jedi" "A New Hope" ...
+##   ..$ : chr [1:3] "Attack of the Clones" "Revenge of the Sith" "A New Hope"
+##   ..$ : chr [1:3] "Attack of the Clones" "Revenge of the Sith" "A New Hope"
+##   ..$ : chr "A New Hope"
+##   ..$ : chr "A New Hope"
+##   ..$ : chr [1:6] "The Empire Strikes Back" "Attack of the Clones" "The Phantom Menace" "Revenge of the Sith" ...
+##   ..$ : chr [1:3] "Attack of the Clones" "The Phantom Menace" "Revenge of the Sith"
+##   ..$ : chr [1:2] "Revenge of the Sith" "A New Hope"
+##   ..$ : chr [1:5] "The Empire Strikes Back" "Revenge of the Sith" "Return of the Jedi" "A New Hope" ...
+##   ..$ : chr [1:4] "The Empire Strikes Back" "Return of the Jedi" "A New Hope" "The Force Awakens"
+##   ..$ : chr "A New Hope"
+##   ..$ : chr [1:3] "The Phantom Menace" "Return of the Jedi" "A New Hope"
+##   ..$ : chr [1:3] "The Empire Strikes Back" "Return of the Jedi" "A New Hope"
+##   ..$ : chr "A New Hope"
+##   ..$ : chr [1:5] "The Empire Strikes Back" "Attack of the Clones" "The Phantom Menace" "Revenge of the Sith" ...
+##   ..$ : chr [1:5] "The Empire Strikes Back" "Attack of the Clones" "The Phantom Menace" "Revenge of the Sith" ...
+##   ..$ : chr [1:3] "The Empire Strikes Back" "Attack of the Clones" "Return of the Jedi"
+##   ..$ : chr "The Empire Strikes Back"
+##   ..$ : chr "The Empire Strikes Back"
+##   ..$ : chr [1:2] "The Empire Strikes Back" "Return of the Jedi"
+##   ..$ : chr "The Empire Strikes Back"
+##   ..$ : chr [1:2] "Return of the Jedi" "The Force Awakens"
+##   ..$ : chr "Return of the Jedi"
+##   ..$ : chr "Return of the Jedi"
+##   ..$ : chr "Return of the Jedi"
+##   ..$ : chr "Return of the Jedi"
+##   ..$ : chr "The Phantom Menace"
+##   ..$ : chr [1:3] "Attack of the Clones" "The Phantom Menace" "Revenge of the Sith"
+##   ..$ : chr "The Phantom Menace"
+##   ..$ : chr [1:2] "Attack of the Clones" "The Phantom Menace"
+##   ..$ : chr "The Phantom Menace"
+##   ..$ : chr "The Phantom Menace"
+##   ..$ : chr "The Phantom Menace"
+##   ..$ : chr [1:2] "Attack of the Clones" "The Phantom Menace"
+##   ..$ : chr "The Phantom Menace"
+##   ..$ : chr "The Phantom Menace"
+##   ..$ : chr [1:2] "Attack of the Clones" "The Phantom Menace"
+##   ..$ : chr "The Phantom Menace"
+##   ..$ : chr "Return of the Jedi"
+##   ..$ : chr [1:3] "Attack of the Clones" "The Phantom Menace" "Revenge of the Sith"
+##   ..$ : chr "The Phantom Menace"
+##   ..$ : chr "The Phantom Menace"
+##   ..$ : chr "The Phantom Menace"
+##   ..$ : chr [1:3] "Attack of the Clones" "The Phantom Menace" "Revenge of the Sith"
+##   ..$ : chr [1:3] "Attack of the Clones" "The Phantom Menace" "Revenge of the Sith"
+##   ..$ : chr [1:3] "Attack of the Clones" "The Phantom Menace" "Revenge of the Sith"
+##   ..$ : chr [1:2] "The Phantom Menace" "Revenge of the Sith"
+##   ..$ : chr [1:2] "The Phantom Menace" "Revenge of the Sith"
+##   ..$ : chr [1:2] "The Phantom Menace" "Revenge of the Sith"
+##   ..$ : chr "The Phantom Menace"
+##   ..$ : chr [1:3] "Attack of the Clones" "The Phantom Menace" "Revenge of the Sith"
+##   ..$ : chr [1:2] "Attack of the Clones" "The Phantom Menace"
+##   ..$ : chr "Attack of the Clones"
+##   ..$ : chr "Attack of the Clones"
+##   ..$ : chr "Attack of the Clones"
+##   ..$ : chr [1:2] "Attack of the Clones" "Revenge of the Sith"
+##   ..$ : chr [1:2] "Attack of the Clones" "Revenge of the Sith"
+##   ..$ : chr "Attack of the Clones"
+##   ..$ : chr "Attack of the Clones"
+##   ..$ : chr [1:2] "Attack of the Clones" "Revenge of the Sith"
+##   ..$ : chr [1:2] "Attack of the Clones" "Revenge of the Sith"
+##   ..$ : chr "Attack of the Clones"
+##   ..$ : chr "Attack of the Clones"
+##   ..$ : chr "Attack of the Clones"
+##   ..$ : chr "Attack of the Clones"
+##   ..$ : chr "Attack of the Clones"
+##   ..$ : chr "Attack of the Clones"
+##   ..$ : chr "The Phantom Menace"
+##   ..$ : chr [1:2] "Attack of the Clones" "Revenge of the Sith"
+##   ..$ : chr "Attack of the Clones"
+##   ..$ : chr "Attack of the Clones"
+##   ..$ : chr [1:2] "Attack of the Clones" "Revenge of the Sith"
+##   ..$ : chr "Revenge of the Sith"
+##   ..$ : chr "Revenge of the Sith"
+##   ..$ : chr [1:2] "Revenge of the Sith" "A New Hope"
+##   ..$ : chr [1:2] "Attack of the Clones" "Revenge of the Sith"
+##   ..$ : chr "Revenge of the Sith"
+##   ..$ : chr "The Force Awakens"
+##   ..$ : chr "The Force Awakens"
+##   ..$ : chr "The Force Awakens"
+##   ..$ : chr "The Force Awakens"
+##   ..$ : chr "The Force Awakens"
+##   ..$ : chr [1:3] "Attack of the Clones" "The Phantom Menace" "Revenge of the Sith"
+##  $ vehicles  :List of 87
+##   ..$ : chr [1:2] "Snowspeeder" "Imperial Speeder Bike"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "Imperial Speeder Bike"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "Tribubble bongo"
+##   ..$ : chr [1:2] "Zephyr-G swoop bike" "XJ-6 airspeeder"
+##   ..$ : chr(0) 
+##   ..$ : chr "AT-ST"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "Snowspeeder"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "Tribubble bongo"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "Sith speeder"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "Flitknot speeder"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "Koro-2 Exodrive airspeeder"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "Tsmeu-6 personal wheel bike"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##  $ starships :List of 87
+##   ..$ : chr [1:2] "X-wing" "Imperial shuttle"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "TIE Advanced x1"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "X-wing"
+##   ..$ : chr [1:5] "Jedi starfighter" "Trade Federation cruiser" "Naboo star skiff" "Jedi Interceptor" ...
+##   ..$ : chr [1:3] "Trade Federation cruiser" "Jedi Interceptor" "Naboo fighter"
+##   ..$ : chr(0) 
+##   ..$ : chr [1:2] "Millennium Falcon" "Imperial shuttle"
+##   ..$ : chr [1:2] "Millennium Falcon" "Imperial shuttle"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "X-wing"
+##   ..$ : chr "X-wing"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "Slave 1"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "Millennium Falcon"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "A-wing"
+##   ..$ : chr(0) 
+##   ..$ : chr "Millennium Falcon"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "Naboo Royal Starship"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "Scimitar"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "Jedi starfighter"
+##   ..$ : chr(0) 
+##   ..$ : chr "Naboo fighter"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "Belbullab-22 starfighter"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr "T-70 X-wing fighter"
+##   ..$ : chr(0) 
+##   ..$ : chr(0) 
+##   ..$ : chr [1:3] "H-type Nubian yacht" "Naboo star skiff" "Naboo fighter"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{starwars }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(height)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(species }\SpecialCharTok{==} \StringTok{"Human"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{mean\_height =} \FunctionTok{mean}\NormalTok{(height))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 1
+##   mean_height
+##         <dbl>
+## 1        177.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{starwars }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(height)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(species }\SpecialCharTok{==} \StringTok{"Human"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{mean\_height =} \FunctionTok{mean}\NormalTok{(height))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 1
+##   mean_height
+##         <dbl>
+## 1        177.
+\end{verbatim}
+
+\end{document}

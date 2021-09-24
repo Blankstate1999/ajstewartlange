@@ -1,0 +1,997 @@
+---
+title: "A. J. Stewart Lange R workshops"
+author: "Lee Mercer"
+date: "02/09/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Workshop 2 ------------------------------------------------------------------
+
+### Your first R script
+
+```{r, message=F, warning=F}
+library(see)
+library(tidyverse) # load the tidyverse
+library(ggrepel)
+library(patchwork) # needed to combine our 4 plots at the end
+```
+
+### Read in data 
+
+```{r, message=F, warning=F}
+ufo_sightings <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-06-25/ufo_sightings.csv")
+```
+
+### Plot of top 10 US states with number of sightings in each state
+
+```{r, message=F, warning=F}
+plot1 <- ufo_sightings %>%
+  filter(!is.na(state)) %>%
+  mutate(state = str_to_upper(state)) %>%
+  group_by(state) %>%
+  tally() %>%
+  top_n(10) %>%
+  ggplot(aes(x = reorder(state, n), y = n, fill = state)) +
+  geom_col() + 
+  coord_flip() +
+  guides(fill = FALSE) + 
+  labs(title = "Top 10 States for UFO Sightings",
+       x = NULL, 
+       y = NULL) +
+  ylim(0, 11000) +
+  theme_minimal() +
+  theme(text = element_text(size = 15))
+```
+
+
+### Work out the top 10 states with most UFO sightings
+
+```{r, message=F, warning=F}
+top_states <- ufo_sightings %>%
+  filter(!is.na(state)) %>%
+  group_by(state) %>%
+  tally() %>%
+  top_n(10) %>% 
+  pull(state)
+```
+
+### Work out states within lat and long limits (i.e., exclude Alaska)
+
+```{r}
+tidied_ufo <- ufo_sightings %>%
+  filter(country == "us") %>%
+  filter(latitude > 24 & latitude < 50)
+```
+
+### Plot all sightings on a map of the US, with 10 top states coloured
+
+```{r, message=F, warning=F}
+plot2 <- tidied_ufo %>%
+  ggplot(aes(x = longitude, y = latitude)) + 
+  geom_point(size = .5, alpha = .25) +
+  theme_void() +
+  coord_cartesian() +
+  labs(title = "Sites of UFO Sightings in the US") +
+  guides(colour = FALSE) +
+  guides(fill = FALSE) +
+  theme(text = element_text(size = 15))
+```
+
+### Plot of top 10 UFO shapes spotted in California
+
+```{r, message=F, warning=F}
+plot3 <- tidied_ufo %>%
+  filter(state == "ca") %>%
+  filter(ufo_shape != "other") %>%
+  filter(ufo_shape != "unknown") %>%
+  group_by(ufo_shape) %>%
+  tally() %>%
+  top_n(10) %>%
+  mutate(ufo_shape = str_to_title(ufo_shape)) %>%
+  ggplot(aes(x = reorder(ufo_shape, n), y = n, fill = ufo_shape)) +
+  geom_col() + 
+  coord_flip() +
+  guides(fill = FALSE) + 
+  labs(title = "Top 10 UFO Shapes spotted in California",
+       x = NULL, 
+       y = NULL) +
+  theme_minimal() +
+  theme(text = element_text(size = 15))
+```
+
+### Put plots together
+
+```{r, message=F, warning=F}
+my_plot <- (plot1 + plot3) / (plot2)
+ggsave("ufo_plot.jpg", plot = my_plot, width = 12, height = 10)
+my_plot
+```
+
+\newpage
+
+## Workshop 3 ------------------------------------------------------------------
+
+### Data wrangling
+
+```{r, message=F, warning=F}
+library(tidyverse)
+
+head(mpg,10)
+str(mpg)
+```
+
+```{r, message=F, warning=F}
+mpg %>% 
+  select(manufacturer)
+
+mpg %>%
+  distinct(manufacturer) %>%  #Identifies unique entries
+  count()                     #Counts unique entries
+
+mpg %>%
+  filter(manufacturer == "honda") #Extracts all 'Honda' entries
+
+mpg %>%
+  filter(manufacturer == "honda" | manufacturer == "audi")  # | = 'or'
+
+mpg %>%
+  filter(manufacturer == "honda" & year == "1999") %>%
+  select(manufacturer, year, cty, hwy)
+
+mpg %>%
+  mutate(manufacturer = str_to_title(manufacturer), 
+         model = str_to_title(model)) %>%
+  select(manufacturer, model, year, trans, hwy)
+```
+
+```{r, message=F, warning=F}
+my_messy_data <- read_csv("https://raw.githubusercontent.com/ajstewartlang/03_data_wrangling/master/data/my_data.csv")
+
+head(my_messy_data)
+
+my_tidied_data <- my_messy_data %>%
+  mutate(condition = recode(condition,
+                            "1" = "PrimeA_TargetA",
+                            "2" = "PrimeA_TargetB",
+                            "3" = "PrimeB_TargetA",
+                            "4" = "PrimeB_TargetB")) %>%
+  separate(col = "condition", into = c("Prime", "Target"), sep = "_") %>%
+  mutate(Prime = factor(Prime), Target = factor(Target))
+```
+
+### Data summarizing 
+
+```{r, message=F, warning=F}
+library(tidyverse)
+
+mpg %>%
+  group_by(manufacturer) %>%
+  summarise(mean_hwy = mean(hwy), sd_hwy = sd(hwy), number = n()) %>%
+  arrange(-mean_hwy)
+
+mpg %>%
+  group_by(manufacturer) %>%
+  summarise_at(c("displ", "cty", "hwy"), mean, na.rm = T)
+
+mpg %>%
+  group_by(manufacturer) %>%
+  summarise_if(is.numeric, mean, na.rm = T)
+
+mpg %>%
+  group_by(manufacturer) %>%
+  mutate(mean_hwy = mean(hwy), sd_hwy = sd(hwy)) %>%
+  select(-class, -trans)
+
+mpg_with_mean <- mpg %>%
+  group_by(manufacturer) %>%
+  mutate(mean_hwy = mean(hwy), sd_hwy = sd(hwy)) %>%
+  select(-class, -trans)
+
+head(mpg_with_mean)
+str(mpg_with_mean)
+
+head(starwars)
+
+starwars %>%
+  filter(!is.na(height)) %>%
+  filter(species == "Human") %>%
+  summarise(mean_height = mean(height))
+
+starwars %>%
+  filter(!is.na(height)) %>%
+  filter(species == "Human") %>%
+  summarise(mean_height = mean(height))
+```
+
+\newpage
+
+## Workshop 4 ------------------------------------------------------------------
+
+```{r, message=F, warning=F}
+library(tidyverse)
+library(ggplot2)
+
+mpg %>%
+  mutate(manufacturer = str_to_title(manufacturer)) %>% #Changes to title case
+  ggplot2::ggplot(aes(x=manufacturer, y=cty)) +
+  geom_jitter(width = .2, alpha = .75, size = 2) +
+  geom_point() +
+  theme_minimal() +
+  theme(axis.text.x=element_text(angle=45, vjust=0.5, hjust=.5)) +
+  theme(text = element_text(size = 13)) +
+  labs(title = "City Fuel Economy by Car Manufacturer",
+       x = "Manufacturer", 
+       y = "City Fuel Economy (mpg)")
+```
+
+### Improving the plot
+
+```{r, message=F, warning=F}
+library(Hmisc)
+
+mpg %>%
+  mutate(manufacturer = str_to_title(manufacturer)) %>% #Changes to title case
+  ggplot2::ggplot(aes(x=manufacturer, y=cty)) +
+  stat_summary(fun.data = mean_cl_boot, colour = "black", size = 1) +
+  geom_jitter(alpha = .25) +
+  theme_minimal() +
+  theme(axis.text.x=element_text(angle=45, vjust=0.5, hjust=.5)) +
+  theme(text = element_text(size = 13)) +
+  labs(title = "City Fuel Economy by Car Manufacturer",
+       x = "Manufacturer", 
+       y = "City Fuel Economy (mpg)")
+```
+
+### The finished plot?
+
+```{r, message=F, warning=F}
+mpg %>%
+  mutate(manufacturer = str_to_title(manufacturer)) %>%
+  ggplot(aes(x = fct_reorder(manufacturer, .fun = mean, cty), y = cty, colour = manufacturer)) +
+  stat_summary(fun.data = mean_cl_boot, size = 1) +
+  geom_jitter(alpha = .25) +
+  theme_minimal() +
+  theme(text = element_text(size = 13)) +
+  labs(title = "Manufacturer by City Fuel Economy",
+       x = "Manufacturer", 
+       y = "City Fuel Economy (mpg)") +
+  guides(colour = FALSE) +
+  coord_flip()
+```
+
+### Using `facet_wrap()`
+
+```{r, message=F, warning=F}
+mpg %>%
+  filter(class != "suv") %>%
+  mutate(class = str_to_title(class)) %>%
+  ggplot(aes(x = displ, y = cty, colour = class)) + 
+  geom_jitter(width = .2) +
+  theme_minimal() +
+  theme(text = element_text(size = 13)) +
+  labs(title = "City Fuel Economy by Engine Displacement",
+       x = "Engine Displacement (litres)", 
+       y = "City Fuel Economy (mpg)") +
+  guides(colour = FALSE) +
+  facet_wrap(~ class)
+```
+
+### Scatterplots
+
+```{r, message=F, warning=F}
+mpg %>%
+  mutate(class = str_to_upper(class)) %>%
+  ggplot(aes(x = cty, y = displ)) +
+  geom_point(aes(colour = class)) +
+  geom_smooth(se = FALSE) +
+  theme(text = element_text(size = 13)) +
+  theme_minimal() + 
+  labs(x = "City Fuel Economy (mpg)",
+       y = "Engine Displacement (litres)", 
+       colour = "Vehicle Class")
+```
+
+### Plotting with histograms
+
+```{r, message=F, warning=F}
+mpg %>%
+  ggplot(aes(x = displ)) +
+  geom_histogram(binwidth = .5, fill = "grey") +
+  labs(title = "Histogram of Engine Displacement",
+       x = "Engine Displacement (litres)",
+       y = "Count")
+```
+
+### The ggridges package
+
+```{r, message=F, warning=F}
+library(ggridges)
+
+mpg %>%
+  mutate(class = str_to_title(class)) %>%
+  ggplot(aes(x = displ, y = fct_reorder(class, .fun = mean, displ))) +
+  geom_density_ridges(height = .5, aes(fill = class)) +
+  theme_minimal() +
+  theme(text = element_text(size = 13)) +
+  guides(fill = FALSE) + 
+  labs(x = "Engine Displacement (litres)",
+       y = NULL)
+```
+
+### The `NHANES` dataset
+
+```{r, message=F, warning=F}
+library(NHANES)
+
+ncol(NHANES)
+nrow(NHANES)
+```
+
+```{r, message=F, warning=F}
+NHANES %>% 
+  select(ID) %>% 
+  n_distinct()
+```
+To remove duplicates...
+
+```{r, message=F, warning=F}
+NHANES_tidied <- NHANES %>% 
+  distinct(ID, .keep_all = TRUE)
+  
+ncol(NHANES_tidied)
+nrow(NHANES_tidied)
+```
+
+Plotting a histogram...
+
+```{r, message=F, warning=F}
+NHANES_tidied %>%
+  ggplot(aes(x = BMI)) + 
+  geom_histogram(bins = 100, na.rm = TRUE)
+```
+
+Summary statistics...
+
+```{r, message=F, warning=F}
+NHANES_tidied %>% 
+  group_by(Education) %>% 
+  summarise(median = median(BMI, na.rm = TRUE))
+```
+
+`geom_violin`
+
+```{r, message=F, warning=F}
+NHANES_tidied %>% 
+  filter(!is.na(Education) & !is.na(BMI)) %>%
+  ggplot(aes(x = Education, y = BMI, colour = Education)) + 
+  geom_violin() +
+  geom_jitter(alpha = .2, width = .1) +
+  geom_boxplot(alpha = .5) +
+  guides(colour = FALSE) + 
+  labs(title = "Examining the effect of education level on BMI", 
+       x = "Education Level", 
+       y = "BMI")
+```
+
+Plotting interaction effects...
+
+```{r, message=F, warning=F}
+NHANES_tidied %>% 
+  filter(!is.na(Education) & !is.na(BMI) & !is.na(Diabetes)) %>%
+  ggplot(aes(x = Education:Diabetes, y = BMI, colour = Education)) + 
+  geom_violin() +
+  geom_jitter(alpha = .2, width = .1) +
+  geom_boxplot(alpha = .5) +
+  guides(colour = FALSE) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5)) +
+  labs(title = "Examining the effect of education level and diabetes on BMI", 
+       x = "Education Level x Diabetes", 
+       y = "BMI")
+```
+
+Histograms with `facet_wrap()`
+
+```{r, message=F, warning=F}
+NHANES_tidied %>% 
+  filter(!is.na(Education) & !is.na(BMI)) %>%
+  group_by(Education) %>% 
+  ggplot(aes(x = BMI, fill = Education)) +
+  geom_histogram() +
+  guides(fill = FALSE) + 
+  labs(title = "Examining the effect of education level on BMI",
+       x = "BMI", 
+       y = "Number of cases") + 
+  facet_wrap(~ Education)
+```
+
+Density function...
+
+```{r, message=F, warning=F}
+NHANES_tidied %>% 
+  filter(!is.na(Education) & !is.na(BMI)) %>%
+  group_by(Education) %>% 
+  ggplot(aes(x = BMI, fill = Education)) +
+  geom_histogram(aes(y = ..density..)) +
+  geom_density(aes(y = ..density..)) +
+  guides(fill = FALSE) + 
+  labs( title = "Examining the effect of education level on BMI", 
+        x = "BMI", 
+        y = "Density") + 
+  facet_wrap(~ Education)
+```
+
+\newpage
+
+## Workshop 5 - Regression (Part 1) --------------------------------------------
+
+### Revision
+
+**Parametric statistics** assume that sample data comes from a population that can be adequately modelled by a probability distribution that has a fixed set of parameters.
+
+Assumptions of parametric statistics:
+(1) residuals are normally distributed
+(2) homogeneity of variance
+(3) Interval data
+(4) Independence
+
+**Variance** is the measure of the amount by which data associated with a variable vary from the mean of that variable.
+
+If two variables **covary**, then when one variable deviates from the mean, we expect the other variable to deviate from its mean in a similar way.
+
+**Pearson's product-moment correlation** (Pearson's *r*) = covariance result / (SD of V1) x (SD of V2). Pearson's *r* measured on a scale of -1 to 1. Square Pearson's *r* to get R^2^. Multiple that value by 100 to get the % of variance explained in one variable by the other.
+
+**Regression** is where we want to predict the value of one variable (outcome variable) on the basis of one or more predictor variables. Simple regression is where we have one predictor, multiple regression is where we have more than one. One of the most commonly used regression types is **ordinary least squares** (OLS) which works by minimising the distance (deviation) between the observed data and the linear model.
+
+### Plotting a regression line
+
+With OLS regression, we can plot a straight line that minimises the residuals (i.e. the error).
+
+$\beta_{0}$ = intercept (when $x = 0$)\
+$\beta$ = gradient of the line\
+$Residual_{i}$ - the difference between predicted score and actual score for participant $i$
+
+
+$$y = \beta_{0} + \beta x_{i}~ + Residual_{i}$$
+
+
+Comparing mean and regression line the sums of squares. If the SS~M~ of a regression model is large, then the regression model is better. If SS~M~ small then the regression line not much better model of data than mean.
+
+To calculate the proportion of improvement in prediction by looking at ration of SS~M~ to SS~T~. Actually this is R^2^.
+
+$$R^{2} = \frac{SS_{M}}{SS_{T}}$$
+...and this is the same *R^2^* that we worked out by squaring the Pearson correlation coefficient.
+
+Can also use the F-ratio using the mean sums of squares.
+
+$$F = \frac{MS_{M}}{MS_{R}}$$
+A good model will have large MS~M~ and a small MS~R~. In other words, the improvement of the model compare to the mean will be good. The difference between the model and our observed data will be small. If MS~M~ is large and MS~R~ is small, then *F* will be large. Determine whether *F* value significant by looking up in table. For SS~M~ the degrees of freedom = no. of variables in model. For SS~R~ = no. of observations - no. of parameters being estimated.
+
+```{r}
+library(tidyverse)
+library(Hmisc)
+library(performance)
+```
+
+```{r, warning=F, message=F}
+crime <- read_csv("https://raw.githubusercontent.com/ajstewartlang/09_glm_regression_pt1/master/data/crime_dataset.csv")
+head(crime)
+```
+Tidy the data...
+
+```{r}
+crime <- separate(crime, col = "City, State", into = c("City", "State"))
+head(crime)
+```
+
+```{r}
+crime <- crime %>%
+  rename(House_price = index_nsa) %>%
+  rename(Violent_Crimes = "Violent Crimes")
+head(crime)
+```
+
+Building a plot...
+
+```{r, message=F, warning=F}
+crime %>%
+  ggplot(aes(x = Population, y = Violent_Crimes)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() +
+  theme(text = element_text(size = 13)) +
+  labs(x = "Population", 
+       y = "Violent Crimes")
+```
+
+Pearson's R...
+
+```{r, message=F, warning=F}
+rcorr(crime$Population, crime$Violent_Crimes)
+```
+
+```{r, message=F, warning=F}
+crime_filtered <- filter(crime, Population < 2000000)
+crime_filtered %>%
+  ggplot(aes(x = Population, y = Violent_Crimes)) + 
+  geom_point(alpha = .25) + 
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() +
+  theme(text = element_text(size = 13)) +
+  labs(x = "Population", 
+       y = "Violent Crimes")
+```
+
+```{r}
+rcorr(crime_filtered$Population, crime_filtered$Violent_Crimes)
+```
+
+```{r, message=F, warning=F}
+crime_filtered <- filter(crime_filtered, Year == 2015)
+crime_filtered %>%
+  ggplot(aes(x = Population, y = Violent_Crimes, label = City)) + 
+  geom_point() + 
+  geom_text(nudge_y = 500, check_overlap = TRUE) + 
+  geom_smooth(method = "lm", se = FALSE) + 
+  xlim(0, 1800000) +
+  theme_minimal() +
+  theme(text = element_text(size = 13)) +
+  labs(x = "Population", 
+       y = "Violent Crimes")
+```
+
+```{r, message=F, warning=F}
+rcorr(crime_filtered$Population, crime_filtered$Violent_Crimes)
+```
+
+Model the data...
+
+```{r}
+model1 <- lm(Violent_Crimes ~ 1, data = crime_filtered)
+model2 <- lm(Violent_Crimes ~ Population, data = crime_filtered)
+```
+
+Checking our assumptions...
+
+```{r}
+check_model(model2)
+```
+
+```{r, message=F, warning=F}
+anova(model1, model2)
+```
+
+Interpreting our model...
+
+```{r, message=F, warning=F}
+summary(model2)
+```
+
+The intercept corresponds to where our regression line intercepts the y-axis, and the Population parameter corresponds to the slope of our line. We see that for every increase in population by 1 there is an extra 0.006963 increase in violent crime.
+
+For a city with a population of about a million, there will be about 7907 Violent Crimes. We calculate this by multiplying the estimate of our predictor (0.006963) by 1,000,000 and then adding the intercept (944.3). This gives us 7907.3 crimes - which tallys with what you see in our regression line above. We may have a few outliers - how would you figure out what those were? Try excluding any outliers you find and re-building your model.
+
+\newpage
+
+## Workshop 6 - Regression (Part 2) --------------------------------------------
+
+### Considerations
+
+- Sample size - do we have enough **power** to detect our minimal effect size of interest?
+- Do we need to worry about issue related **multicollinearity** and **singularity**?
+- Ensure our residuals are approximately normal - and the way don't have any issues around **skewness**, **non-linearity** or **homoscedasticity**.
+Do we have any **outliers** of influential cases?
+
+### How big an 'N'?
+
+Use data simulation, but rule of thumb...
+- For testing the regression model, N > 49 + 8k (where k = no. of predictors)
+- For testing individual predictors, N > 103 + k
+(choose the one the produces the greater number)
+
+### Multicollinearity and singularity
+
+Multicollinearity: where two or more variables are highly correlated, tested by examining **Variance Inflation Factor (VIF)** value for each variable. Use `vif()` function in the `car` package in R. A VIF factor of >10 suggests a multicollinearity issue (although >5 has been suggested to).
+
+Singularity: redundancy, e.g. one of the variables is a combination of two or more of the other IVs.
+
+We use collinearity diagnostics to see if we have a problem.
+
+### Assumptions
+
+#### Normality
+
+For every predicted score, the observed score around that prediction should be normally distributed. Can be investigated using a **Q-Q plot** (expect a straight diagonal line).
+
+#### Linearity
+
+Relationship to be modelled must be linear. That is, an increase in the scores of the predictor should be followed by an increase in the outcome and vice versa. 
+
+There must be a uniform relationship between the fitted values and the residual error that can be captured by a straight line.
+
+Minor violation of this assumption is not dire - it weakens the power of the analysis to capture the relationship between the variables.
+
+#### Homoscedasticity
+
+SDs of errors of predictions should be approximately equal for all predicted scores. That is, the amount of error is the same at different predicted balues of the outcome.
+
+Violation is not terminal, but does weaken the analysis.
+
+Can be corrected by using weighted (generalised) least squares regression instead of OLS regression.
+
+#### Outliers
+
+Outliers are cases that don't fit model well - have large residuals. Like correlation, regression models are sensitive to outliers so it makes sense to remove them to improve the model. But a bit of a judgement call - they may be theoretically interesting.
+
+Influential cases can be detected easily via **Cook's distance** (part of our diagnostic plots) using the `performance` package.
+
+### The linear model with multiple predictors
+
+```{r, message=F, warning=F}
+MRes_tut2 <- read.csv("https://raw.githubusercontent.com/ajstewartlang/10_glm_regression_pt2/master/data/MRes_tut2.csv") # using read_csv here gave an error
+```
+
+```{r, message=F, warning=F}
+library(tidyverse) # Load the tidyverse packages
+library(Hmisc) # Needed for correlation
+library(MASS) # Needed for maths functions
+library(car) # Needed for VIF calculation
+library(olsrr) # Needed for stepwise regression 
+library(performance) # Needed to check model assumptions
+```
+
+### Examing possible relationships
+
+```{r}
+ggplot(MRes_tut2, aes(x = age, y = corr_spell)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() +
+  theme(text = element_text(size = 13))
+```
+
+```{r}
+ggplot(MRes_tut2, aes(x = RA, y = corr_spell)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() +
+  theme(text = element_text(size = 13))
+```
+
+```{r}
+ggplot(MRes_tut2, aes(x = std_RA, y = corr_spell)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() +
+  theme(text = element_text(size = 13)) 
+```
+
+```{r}
+ggplot(MRes_tut2, aes(x = std_SPELL, y = corr_spell)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() +
+  theme(text = element_text(size = 13))
+```
+
+### Model the data
+
+We are going to do hierarchical regression first - we’ll build one model (which we’ll call model0) that is the mean of our outcome variable, and another model (model1) which contains all our predictors:
+
+```{r, message=F, warning=F}
+model0 <- lm(corr_spell ~ 1, data = MRes_tut2)
+model1 <- lm(corr_spell ~ age + RA + std_RA + std_SPELL, data = MRes_tut2)
+```
+
+Compare them...
+
+```{r, message=F, warning=F}
+anova(model0, model1)
+```
+We see that the models differ from each other (look a the p-value of the comparison) and that the model with the four predictors has the lower Residuals (RSS) value meaning there is less error between the model and the observed data relative to the simpler intercept-only model (i.e., the mean) and the observed data.
+
+### Checking our assumptions
+
+OK, so they differ - now let’s plot information about our model assumptions - remember, we are particularly interested in Cook’s distance values for our case…
+
+```{r, message=F, warning=F}
+check_model(model1)
+```
+
+The errors looks fairly equally distributed along our fitted values (homoscedasticity) - although a little worse for high fitted values - and from the Q-Q plot we can tell they look fairly normal (they should follow the diagonal). How about influential cases? So, Case 10 looks a bit dodgy - it has a high Cook’s Distance value - which suggests it is having a disproportionate effect on our model. Let’s exclude it using the filter() function - the symbol != means ‘does not equal’ so we are selecting values other than Case 10.
+
+Dropping an influential case...
+
+```{r}
+MRes_tut2_drop10 <- filter(MRes_tut2, case != "10")
+```
+
+Remodel that data...
+
+We now create another model (`model2`) which doesn’t include Case 10.
+
+```{r}
+model2 <- lm(corr_spell ~ age + RA + std_RA + std_SPELL, data = MRes_tut2_drop10)
+```
+
+Let’s check the model assumptions again using `check_model()`.
+
+```{r}
+check_model(model2)
+```
+
+Now, let’s look at the multicollinearity values measured by VIF:
+
+```{r}
+vif(model2)
+```
+
+It looks like RA and std_RA are problematic. We can look at the correlation between them using the `rcorr()` function:
+
+```{r}
+rcorr(MRes_tut2_drop10$RA, MRes_tut2_drop10$std_RA)
+```
+
+Remodel the data...
+
+The correlation is pretty high (0.88), so let’s exclude the predictor with the highest VIF value (which is RA) and build a new model:
+
+```{r}
+model3 <- lm(corr_spell ~ age + std_RA + std_SPELL, data = MRes_tut2_drop10)
+vif(model3)
+```
+
+Checking our assumptions...
+
+```{r}
+check_model(model3)
+```
+
+### Summary of our model
+
+```{r}
+summary(model3)
+```
+
+```{r}
+model0 <- lm(corr_spell ~ 1, data = MRes_tut2_drop10)
+anova(model3, model0)
+```
+
+We’d write our equation as something like:
+
+`Spelled correct = -209.44 + 1.10(age) + 0.38(std_RA) + 1.21(std_SPELL) + residual`
+
+### Stepwise regression
+
+We can also do stepwise regression - forwards is when you start with the null model and predictors are added until they don’t explain any more variance, backwards is when you start with the full model and remove predictors until removal starts affecting your model’s predictive ability. Let’s keep case 10 dropped and also drop the high VIF predictor (RA). This is handy for models with lots of predictors where the order in sequential regression is not obvious.
+
+Model the data...
+
+```{r}
+model0 <- lm(corr_spell ~ 1, data = MRes_tut2_drop10)
+model1 <- lm(corr_spell ~ age + std_RA + std_SPELL, data = MRes_tut2_drop10)
+```
+
+Let's do stepwise forwards...
+
+```{r}
+steplimitsf <- step(model0, scope = list (lower = model0, upper = model1), direction = "forward")
+```
+
+```{r}
+summary(steplimitsf)
+```
+
+Stepwise backwards...
+
+```{r}
+steplimitsb <- step(model1, direction = "back")
+```
+
+```{r}
+summary(steplimitsb)
+```
+
+And stepwise using both forwards and backwards procedures:
+
+```{r}
+steplimitsboth <- step(model0, scope = list (upper = model1), direction = "both")
+```
+
+Checking assumptions...
+
+```{r}
+check_model(steplimitsboth)
+```
+
+These look ok.
+
+```{r}
+summary(steplimitsboth)
+```
+
+You’ll see that the same final model is arrived it in each case. We have three significant predictors.
+
+### Entering predictors based on their p-values
+
+We can also use the `ols_step_forward_p()` function from the package `olsrr` - this works by finding the best model by entering the predictors based on their p values. There are other methods within the `olsrr` package. To see them, type `olsrr::` into the console window.
+
+```{r}
+pmodel <- ols_step_forward_p(model1)
+pmodel
+```
+
+\newpage
+
+## Workshop 8 - ANOVA (Part 1) -------------------------------------------------
+
+### Inroduction
+
+Why not multiple *t*-tests? - increases chances of a Type I error. E.g. an experiment with three tests = 0.95^3^ chance of a Type I error.
+
+This is known as the **familywise error rate**, or, 1-(0.95)^n^
+
+*t*-tests tell us whether or not two samples have statistically indistinguishable means. ANOVA tells us whether two or more samples have statistically indistinguishable means. As the *t*-test produces the *t*-statistic, the ANOVA gives us an F-statistic or F-ratio which compares the amount of systematic variance in our data with the amount of unsystematic variance.
+
+Need to do *post-hoc* tests. These work by doing pairwise comparisons on all different combinations of experimental groups. They control for the familywise error rate. The **Bonferroni** method divides our critical *p*-value (0.05) by the number of tests. If we are conducting ten tests, then for each test the critical *p* is 0.0005 - but this increases our changes of a Type II error. 
+
+When deciding what *post-hoc* tests to use:
+- Does it control the Type I error rate?
+- Does it control the Type II error rate?
+- Is it reliable when ANOVA assumptions have been violated?
+
+The **least significant differences** (LSD) test doesn't control for the Type I error and is like doing multiple *t*-tests on the data (but only if the ANOVA itself is significant). **Bonferroni** and **Tukey** both control for Type I errors but are conservative. **Bonferroni** works by dividing the critical alpha level by the number of tests conducted. **Tukey** is less conservative than **Bonferroni**. 
+
+### Example ANOVA
+
+```{r, message=F, warning=F}
+install.packages("afex")
+install.packages("emmeans")
+```
+
+```{r,message=F, warning=F}
+library(tidyverse)  # load the tidyverse package
+library(afex)       # load afex for running ANOVA
+library(emmeans)    # load emmeans for running pairwise comparisons
+```
+
+Reading in our data...
+
+```{r}
+my_data <- read_csv("https://raw.githubusercontent.com/ajstewartlang/11_glm_anova_pt1/master/data/cond.csv")
+head(my_data)
+```
+
+Tidying our data...
+
+```{r, message=F, warning=F}
+my_data_tidied <- my_data %>%
+  mutate(Condition = factor(Condition))
+head(my_data_tidied)
+```
+
+Summarising our data...
+
+```{r, message=f, warning=F}
+my_data_tidied %>%
+  group_by(Condition) %>%
+  summarise(mean = mean(Ability), sd = sd(Ability))
+```
+
+Visualising our data...
+
+```{r}
+set.seed(1234)
+my_data_tidied %>% 
+  ggplot(aes(x = Condition, y = Ability, colour = Condition)) +
+  geom_violin() +
+  geom_jitter(width = .1) +
+  guides(colour = FALSE) +
+  stat_summary(fun.data = "mean_cl_boot", colour = "black") +
+  theme_minimal() +
+  theme(text = element_text(size = 13)) 
+```
+
+Building our ANOVA model...
+
+```{r, messages=F, warnings=F}
+model <- aov_4(Ability ~ Condition + (1 | Participant), data = my_data_tidied)
+summary(model)
+```
+
+Interpreting the model...
+
+The effect size (ges) is generalised eta squared and for designs with more than one factor it can be a useful indicator of how much variance in the dependent variable can be explained by each factor (plus any interactions between factors).
+
+So, we there is an effect in our model - the F-value is pretty big and the p-value pretty small) but we can’t know what’s driving the difference yet. We need to run some pairwise comparisons using the emmeans() function to tell us what mean(s) differ(s) from what other mean(s).
+
+```{r, messages=F}
+emmeans(model, pairwise ~ Condition)
+```
+
+Note that the default adjustment for multiple comparisons is Tukey’s. We can change that by adding an extra parameter to our model such as adjust = "bonferonni"). In this case, it doesn’t make any difference to our comparisons.
+
+```{r, messages=F}
+emmeans(model, pairwise ~ Condition, adjust = "bonferroni")
+```
+
+We found a significant effect of Beverage type (F (2,42) = 297.05, p < .001, generalised η2 = .93). Tukey comparisons revealed that the Water group performed significantly worse than the Single Espresso Group (p < .001), that the Water group performed significantly worse than the Double Espresso Group (p < .001), and that the Single Espresso Group performed significantly worse than the Double Espresso Group (p < .001).
+
+In other words, drinking some coffee improves motor performance relative to drinking water, and drinking a lot of coffee improves motor performance even more.
+
+
+### ANOVA (repeated-measures design)
+
+Reading in the data...
+
+```{r}
+rm_data <- read_csv("https://raw.githubusercontent.com/ajstewartlang/11_glm_anova_pt1/master/data/rm_data.csv")
+head(rm_data)
+```
+Recode Condition as a factor...
+
+```{r}
+rm_data_tidied <- rm_data %>%
+  mutate(Condition = factor(Condition))
+head(rm_data_tidied)
+```
+
+Summarising our data...
+
+```{r}
+rm_data_tidied %>%
+  group_by(Condition) %>%
+  summarise(mean = mean(RT), sd = sd (RT))
+```
+
+Visualising our data...
+
+Note here that we are using the `fct_reorder()` function to reorder the levels of our factor based on the RT. This can be useful to make our visualisations more easily interpretable.
+
+```{r}
+rm_data_tidied %>%
+  ggplot(aes(x = fct_reorder(Condition, RT), y = RT, colour = Condition)) +
+  geom_violin() +
+  geom_jitter(width = .1) +
+  guides(colour = FALSE) +
+  stat_summary(fun.data = "mean_cl_boot", colour = "black") +
+  theme_minimal() +
+  theme(text = element_text(size = 13)) +
+  labs(x = "Condition", y = "RT (s)")
+```
+
+Building our ANOVA model...
+
+We build our ANOVA model in a similar way as we did previously. Except in this case our random effect we define as '(1 + Condition | Participant)'. I order to capture the fact that our 'Condition' is a repeated measures factor, we add it to the random effect term like this.
+
+```{r}
+rm_model <- aov_4(RT ~ Condition + (1 + Condition | Participant), data = rm_data_tidied)
+```
+
+Intepreting the model output...
+
+```{r}
+summary(rm_model)
+```
+
+With this option, we didn’t get the effect size measure in our measure. We can generate that though by asking for our model to be presented in anova format using the `anova()` function.
+
+```{r}
+anova(rm_model)
+```
+
+The effect size is measured by ges and is the recommended effect size measure for repeated measures designs (Bakeman, 2005). Note the dfs in this output are always corrected as if there is a violation of sphericity (violated when the variances of the differences between all possible pairs of within-subject conditions (i.e., levels of the independent variable) are not equal) - to be conservative (and to avoid Type I errors) we might be better off to always choose these corrected dfs.
+
+From this, we can see we have effect of Condition. But we don’t know where the differences lie between the different levels of our factor. So we use the `emmeans()` function to find that out. Here we will be using the Bonferroni correction for multiple comparisons.
+
+```{r}
+emmeans(rm_model, pairwise ~ Condition, adjust = "Bonferroni")
+```
+
+From the above we can see that all conditions differ from all other conditions, apart from the Easy vs. Very Easy comparison which is not significant.
+
+### Factorial ANOVA
